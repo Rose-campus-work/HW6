@@ -1,0 +1,53 @@
+@startuml SchoolFacilityRentalSequence
+
+actor Renter
+participant Website
+actor "School Staff" as Staff
+participant "Payment Service" as Payment
+participant "Email Service" as Email
+
+== Submission & Verification ==
+Renter -> Website: submitRequest(facilityDetails)
+activate Website
+Website -> Website: checkAvailability()
+Website -> Staff: forwardRequest(bookingData)
+deactivate Website
+
+activate Staff
+Staff -> Staff: reviewRequest()
+
+== Decision: Approval vs Rejection ==
+alt Approved
+    Staff -> Website: approveRequest()
+    activate Website
+    Website --> Renter: promptPayment()
+    
+    Renter -> Website: enterPaymentDetails()
+    Website -> Payment: processPayment(amount)
+    activate Payment
+    
+    == Decision: Payment Success vs Failure ==
+    alt Payment Success
+        Payment --> Website: paymentSucceeded()
+        Website -> Website: saveBooking()
+        Website -> Email: sendConfirmationRequest()
+        activate Email
+        Email --> Renter: sendConfirmationEmail()
+        deactivate Email
+        Website --> Renter: displayBookingConfirmed()
+    else Payment Failure
+        Payment --> Website: paymentFailed()
+        deactivate Payment
+        Website --> Renter: displayPaymentFailure()
+    end
+    deactivate Website
+
+else Rejected
+    Staff -> Website: rejectRequest()
+    activate Website
+    Website --> Renter: displayRejectionNotice()
+    deactivate Website
+    deactivate Staff
+end
+
+@endum

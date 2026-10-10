@@ -1,0 +1,44 @@
+@startuml SchoolFacilityRental
+
+|Renter|
+start
+:Choose facility;
+
+|Website|
+if (Check availability) then ([not available])
+  :Display unavailability message;
+  stop
+else ([available])
+
+  |Renter|
+  :Submit booking request;
+endif
+
+|School Staff|
+if (Review request) then ([rejected])
+
+  |Website|
+  :Notify of rejection;
+  stop
+else ([approved])
+
+  |Renter|
+  :Provide payment details;
+endif
+
+|Payment Service|
+if (Process payment) then ([payment fails])
+
+  |Website|
+  :Display payment failure error;
+  stop
+else ([payment succeeds])
+
+  |Email Service|
+  :Send confirmation email;
+endif
+
+|Website|
+:Display booking confirmation screen;
+stop
+@endum
